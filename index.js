@@ -43,14 +43,16 @@ function myJSONParse(jsonString) {
         } else if (token === ':') {
         } else if (token === ',') {
         } else {
+            const parsedValue = JSON.parse(token);
             if (key === null) {
-                key = JSON.parse(token);
+                key = parsedValue;
             } else {
-                const value = JSON.parse(token);
-                if (currentObject instanceof Array) {
-                    currentObject.push(value);
+                if (currentObject instanceof Array && typeof key === 'string') {
+                    const obj = {};
+                    obj[key] = parsedValue;
+                    currentObject.push(obj);
                 } else if (key) {
-                    currentObject[key] = value;
+                    currentObject[key] = parsedValue;
                     key = null;
                 }
             }
@@ -97,6 +99,7 @@ try {
 } catch (error) {
     console.error(error.message);
 }
+
 
 
 
