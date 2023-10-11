@@ -3,7 +3,7 @@ function myJSONParse(jsonString) {
     let currentObject = null;
     let key = null;
 
-    const regex = /(".*?"|\d+|\[|\]|\{|\}|\:|\,|true|false|null)/g;
+    const regex = /(".*?"|-?\d+|\[|\]|\{|\}|\:|\,|true|false|null)/g;
     const tokens = jsonString.match(regex) || [];
 
     tokens.forEach(token => {
@@ -43,17 +43,17 @@ function myJSONParse(jsonString) {
         } else if (token === ':') {
         } else if (token === ',') {
         } else {
-            if (key === null) {
-                key = token.startsWith('"') ? token.slice(1, -1) : token;
+            const value = token.startsWith('"') ? token.slice(1, -1) :
+                          token === 'true' ? true :
+                          token === 'false' ? false :
+                          token === 'null' ? null :
+                          !isNaN(token) ? parseFloat(token) : token;
+            if (key === null && !(currentObject instanceof Array)) {
+                key = value;
             } else {
-                const value = token.startsWith('"') ? token.slice(1, -1) : token;
                 if (currentObject instanceof Array) {
-                    if (key === currentObject.length) {
-                        currentObject.push(value);
-                    } else {
-                        currentObject[key] = value;
-                    }
-                } else if (key) {
+                    currentObject.push(value);
+                } else if (key !== null) {
                     currentObject[key] = value;
                     key = null;
                 }
@@ -67,6 +67,8 @@ function myJSONParse(jsonString) {
 
     return currentObject;
 }
+
+
 
 const jsonString = `{
     "id": "647ceaf3657eade56f8224eb",
@@ -94,6 +96,9 @@ const jsonString = `{
         }
     ]
 }`;
+
+const fakeParseJSON = JSON.parse;
+console.log(fakeParseJSON(jsonString));
 
 try {
     const jsonObject = myJSONParse(jsonString);
