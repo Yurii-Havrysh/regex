@@ -43,16 +43,18 @@ function myJSONParse(jsonString) {
         } else if (token === ':') {
         } else if (token === ',') {
         } else {
-            const parsedValue = JSON.parse(token);
             if (key === null) {
-                key = parsedValue;
+                key = token.startsWith('"') ? token.slice(1, -1) : token;
             } else {
-                if (currentObject instanceof Array && typeof key === 'string') {
-                    const obj = {};
-                    obj[key] = parsedValue;
-                    currentObject.push(obj);
+                const value = token.startsWith('"') ? token.slice(1, -1) : token;
+                if (currentObject instanceof Array) {
+                    if (key === currentObject.length) {
+                        currentObject.push(value);
+                    } else {
+                        currentObject[key] = value;
+                    }
                 } else if (key) {
-                    currentObject[key] = parsedValue;
+                    currentObject[key] = value;
                     key = null;
                 }
             }
